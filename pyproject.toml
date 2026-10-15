@@ -1,0 +1,25 @@
+[tool.black]
+line-length = 120
+target-version = ["py312"]
+extend-exclude = "migrations|\\.venv"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["migrations", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "DJ", "S"]
+ignore = ["E501", "S101", "S105", "S106", "B904", "DJ008", "DJ012"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B"]
+"**/tests/**" = ["S", "B"]
+"config/settings/*" = ["F403", "F405"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py", "tests.py"]
+testpaths = ["tests", "apps"]
+addopts = "-ra -q --strict-markers -p no:cacheprovider --reuse-db"
+filterwarnings = ["ignore::DeprecationWarning"]
