@@ -28,7 +28,10 @@ class Batch(PrefixedIDModel):
     code = models.CharField(max_length=24, unique=True)
     name = models.CharField(max_length=160)
     course = models.ForeignKey("courses.Course", on_delete=models.PROTECT, related_name="batches")
-    trainer = models.ForeignKey("courses.Trainer", on_delete=models.PROTECT, related_name="batches")
+    # Optional: a batch can be created first and a trainer assigned later.
+    trainer = models.ForeignKey(
+        "courses.Trainer", null=True, blank=True, on_delete=models.PROTECT, related_name="batches"
+    )
     start_date = models.DateField(db_index=True)
     end_date = models.DateField()
     capacity = models.PositiveSmallIntegerField()

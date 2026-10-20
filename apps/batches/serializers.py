@@ -194,7 +194,7 @@ class RecordingUpsertSerializer(serializers.Serializer):
 
 class BatchSerializer(serializers.ModelSerializer):
     course_id = serializers.CharField(read_only=True)
-    trainer_id = serializers.CharField(read_only=True)
+    trainer_id = serializers.CharField(read_only=True, allow_null=True)
 
     class Meta:
         model = Batch
@@ -219,7 +219,7 @@ class BatchSummarySerializer(BatchSerializer):
     """Batch + course/trainer names + membership counters (annotated by batch_summary_queryset)."""
 
     course_title = serializers.CharField(source="course.title", read_only=True)
-    trainer_name = serializers.CharField(source="trainer.name", read_only=True)
+    trainer_name = serializers.CharField(source="trainer.name", read_only=True, allow_null=True)
     total_students = serializers.IntegerField(read_only=True)
     completed_students = serializers.IntegerField(read_only=True)
     in_progress_students = serializers.IntegerField(read_only=True)
@@ -295,7 +295,9 @@ class BatchDetailSerializer(BatchSummarySerializer):
 class BatchUpsertSerializer(serializers.Serializer):
     name = serializers.CharField(min_length=3, max_length=160)
     course_id = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all(), source="course")
-    trainer_id = serializers.PrimaryKeyRelatedField(queryset=Trainer.objects.all(), source="trainer")
+    trainer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Trainer.objects.all(), source="trainer", required=False, allow_null=True, default=None
+    )
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     capacity = serializers.IntegerField(min_value=1, max_value=1000)

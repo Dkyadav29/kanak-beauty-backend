@@ -184,6 +184,28 @@ def test_create_batch_validation(admin_client, course, trainer):
     assert res.status_code == 400 and "capacity" in res.json()["details"]
 
 
+def test_trainer_is_optional(admin_client, batch, course, trainer):
+    data = payload(course, trainer)
+    del data["trainerId"]
+    res = admin_client.post(LIST_URL, data, format="json")
+    assert res.status_code == 201, res.json()
+    assert res.json()["trainerId"] is None
+    assert Batch.objects.get(pk=res.json()["id"]).trainer is None
+
+    res = admin_client.post(LIST_URL, payload(course, trainer, trainerId=None, name="No trainer"), format="json")
+    assert res.status_code == 201, res.json()
+
+    # Assigning and then clearing the trainer on an existing batch.
+    res = admin_client.put(detail_url(batch.id), payload(course, trainer, trainerId=None), format="json")
+    assert res.status_code == 200, res.json()
+    assert res.json()["trainerId"] is None
+    row = next(b for b in admin_client.get(LIST_URL).json()["items"] if b["id"] == batch.id)
+    assert row["trainerName"] is None
+
+    res = admin_client.post(LIST_URL, payload(course, trainer, trainerId="tr_missing"), format="json")
+    assert res.status_code == 400 and "trainerId" in res.json()["details"]
+
+
 def test_update_batch(admin_client, batch, course, trainer):
     res = admin_client.put(detail_url(batch.id), payload(course, trainer, name="Renamed", capacity=20), format="json")
     assert res.status_code == 200, res.json()
