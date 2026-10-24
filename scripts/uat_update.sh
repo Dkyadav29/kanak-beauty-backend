@@ -5,7 +5,7 @@
 #   BRANCH=feature/x bash scripts/uat_update.sh
 #
 # First run migrates the old monorepo checkout (~/apps/kanak-beautyy/backend)
-# to this repo at ~/apps/kanak-beauty-backend, reusing its .env, venv and media,
+# to this repo at ~/apps/kanak-beauty-backend, reusing its .env and media,
 # and repoints the systemd unit + nginx site. Safe to re-run.
 set -euo pipefail
 
@@ -22,9 +22,8 @@ if [ ! -d "$APP/.git" ]; then
   log "Cloning $REPO into $APP"
   git clone --branch "$BRANCH" "$REPO" "$APP"
   if [ -d "$OLD" ]; then
-    log "Migrating .env / venv / media from old checkout $OLD"
+    log "Migrating .env / media from old checkout $OLD"
     [ -f "$OLD/.env" ] && cp -n "$OLD/.env" "$APP/.env"
-    [ -d "$OLD/.venv" ] && [ ! -d "$APP/.venv" ] && mv "$OLD/.venv" "$APP/.venv"
     [ -d "$OLD/media" ] && [ ! -d "$APP/media" ] && mv "$OLD/media" "$APP/media"
   fi
 fi
@@ -37,7 +36,8 @@ git reset -q --hard "origin/$BRANCH"
 git log --oneline -1
 
 [ -f .env ] || { echo "ERROR: $APP/.env missing. Copy backend/.env.example and fill it in."; exit 1; }
-[ -d .venv ] || { log "Creating venv"; python3 -m venv .venv; }
+# A venv moved from another path has stale shebangs; rebuild it if pip won't run.
+.venv/bin/pip --version >/dev/null 2>&1 || { log "Creating venv"; rm -rf .venv; python3 -m venv .venv; }
 
 log "Installing requirements"
 .venv/bin/pip install -q --upgrade pip
