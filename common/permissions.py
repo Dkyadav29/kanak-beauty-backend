@@ -39,6 +39,7 @@ ROLE_PERMISSIONS: dict[str, tuple[str, ...]] = {
         "certificates:manage",
         "referrals:manage",
         "audit:read",
+        "content:manage",
     ),
 }
 

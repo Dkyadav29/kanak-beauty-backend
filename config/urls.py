@@ -29,6 +29,7 @@ api_v1 = [
     path("", include("apps.referrals.urls")),
     path("", include("apps.reports.urls")),
     path("", include("apps.core.urls")),
+    path("", include("apps.content.urls")),
 ]
 
 # OpenAPI schema and interactive docs list every endpoint, so they are served

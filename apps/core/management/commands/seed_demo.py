@@ -24,6 +24,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.batches.models import AttendanceRecord, Batch, BatchEnrollment, BatchHistoryEvent, LiveSession, Recording
 from apps.certificates.models import Certificate, CertificateVerificationLog
+from apps.content.models import HeroSlide
 from apps.core.models import AuditLog
 from apps.courses.models import Course, CourseModule, LearningMaterial, Lesson, Trainer
 from apps.enrollments.models import CourseEnrollment, LessonProgress
@@ -51,6 +52,50 @@ IMAGES = {
     "trainer3": _img("photo-1544005313-94ddf0286df2", 300),
     "trainer4": _img("photo-1580489944761-15a19d654956", 300),
 }
+
+# Home page hero slider: (id, photo, alt, eyebrow, caption, focus), shown in this order.
+HERO_SLIDES = [
+    (
+        "hero_studio",
+        "photo-1516975080664-ed2fc6a32937",
+        "A professional makeup artist applying makeup to a client during a training session",
+        "Studio practice",
+        "Learn on real models, with real feedback.",
+        "center",
+    ),
+    (
+        "hero_bridal",
+        "photo-1515377905703-c4788e51af15",
+        "A bride with finished bridal makeup and hairstyling",
+        "Bridal artistry",
+        "Master the looks clients book months ahead.",
+        "top",
+    ),
+    (
+        "hero_hair",
+        "photo-1562322140-8baeececf3df",
+        "A hairstylist styling long hair in a salon",
+        "Hairstyling",
+        "From blow-dry basics to editorial updos.",
+        "top",
+    ),
+    (
+        "hero_skincare",
+        "photo-1570172619644-dfd03ed5d881",
+        "A skincare specialist performing a facial treatment",
+        "Skincare",
+        "Understand skin before you treat it.",
+        "top",
+    ),
+    (
+        "hero_kit",
+        "photo-1487412947147-5cebf100ffc2",
+        "Makeup brushes and palette laid out for a class",
+        "Professional kit",
+        "Build and care for a kit that lasts.",
+        "center",
+    ),
+]
 
 TRAINERS = [
     (
@@ -618,6 +663,7 @@ class Command(BaseCommand):
             CourseModule,
             Course,
             Trainer,
+            HeroSlide,
         ):
             model.objects.all().delete()
         User.objects.all().delete()
@@ -636,6 +682,21 @@ class Command(BaseCommand):
         config.max_credit_per_order = Decimal("2000")
         config.currency = "INR"
         config.save()
+
+        # Home page hero slider
+        for order, (hid, photo, alt, eyebrow, caption, focus) in enumerate(HERO_SLIDES):
+            up(
+                HeroSlide,
+                hid,
+                image_url=_img(photo, 1600),
+                image_key="",
+                alt=alt,
+                eyebrow=eyebrow,
+                caption=caption,
+                focus=focus,
+                sort_order=order,
+                is_active=True,
+            )
 
         # Trainers
         trainers: dict[str, Trainer] = {}
@@ -1457,6 +1518,7 @@ class Command(BaseCommand):
     def _print_summary(self):
         counts = [
             ("users", User.objects.count()),
+            ("hero slides", HeroSlide.objects.count()),
             ("trainers", Trainer.objects.count()),
             ("courses", Course.objects.count()),
             ("lessons", Lesson.objects.count()),

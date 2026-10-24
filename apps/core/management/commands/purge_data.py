@@ -19,6 +19,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 from apps.accounts.models import LoginAttempt, OneTimeCode, PasswordResetToken, User
 from apps.batches.models import AttendanceRecord, Batch, BatchEnrollment, BatchHistoryEvent, LiveSession, Recording
 from apps.certificates.models import Certificate, CertificateVerificationLog
+from apps.content.models import HeroSlide
 from apps.core.models import AuditLog
 from apps.courses.models import Course, CourseModule, LearningMaterial, Lesson, Trainer
 from apps.enrollments.models import CourseEnrollment, LessonProgress
@@ -49,6 +50,7 @@ MODELS_IN_DELETE_ORDER = (
     CourseModule,
     Course,
     Trainer,
+    HeroSlide,
     ReferralProgramConfig,
     LoginAttempt,
     OneTimeCode,
